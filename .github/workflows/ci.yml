@@ -236,7 +236,3 @@ jobs:
       #
       - name: run tests w/external common lib
         run: date && cd bx && ctest -VV --output-on-failure && date
-
-      # oops
-      - name: oops test
-        run: false
