@@ -201,7 +201,36 @@ jobs:
           echo "cmake done"
 
       #
-      # build common
+      # build and install standalone common
       #
-      - name: build pdlfs-common
+      - name: build and install standalone pdlfs-common
         run: date && cd /tmp/pdlfs-common/src/b && make && make install && date
+
+      #
+      # build config with external common library
+      #
+      - name: configure project w/external common lib
+        run: |
+          mkdir bx && cd bx
+          export CC=$CI_CC CXX=$CI_CXX
+          cmake -DCMAKE_INSTALL_PREFIX=/tmp/tablefs \
+                -DCMAKE_PREFIX_PATH='/tmp/cache;/tmp/pdlfs-common' \
+                -DCMAKE_BUILD_TYPE="$CI_BUILDTYPE" \
+                -DTABLEFS_PORT_KVRANGE=OFF \
+                -DTABLEFS_PORT_LEVELDB=OFF \
+                -DTABLEFS_COMMON_INTREE=OFF \
+                -DBUILD_SHARED_LIBS=ON \
+                -DBUILD_TESTS=ON ..
+          echo "cmake done"
+
+      #
+      # build project
+      #
+      - name: build project w/external common lib
+        run: date && cd b && make && date
+
+      #
+      # run tests
+      #
+      - name: run tests w/external common lib
+        run: date && cd b && ctest -VV --output-on-failure && date
