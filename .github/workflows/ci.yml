@@ -164,6 +164,7 @@ jobs:
                 -DTABLEFS_PORT_KVRANGE=OFF \
                 -DTABLEFS_PORT_LEVELDB=OFF \
                 -DTABLEFS_COMMON_INTREE=ON \
+                -DPDLFS_SNAPPY=ON \
                 -DBUILD_SHARED_LIBS=ON \
                 -DBUILD_TESTS=ON ..
           echo "cmake done"
@@ -178,11 +179,11 @@ jobs:
       # run tests
       #
       - name: run tests
-        run: date && cd b && echo ctest -VV --output-on-failure && date
+        run: date && cd b && ctest -VV --output-on-failure && date
 
       #
       # now let's repeat with an external (!INTREE) common library.
-      # first checkout and configure the library...
+      # first checkout and configure the common library...
       #
       - name: checkout and configure standalone pdlfs-common
         run: |
@@ -197,17 +198,18 @@ jobs:
                 -DBUILD_SHARED_LIBS=ON \
                 -DPDLFS_COMMON_LIBNAME="tablefs-common" \
                 -DPDLFS_COMMON_DEFINES="TABLEFS" \
-                -DBUILD_TESTS=ON ../pdlfs-common
+                -DPDLFS_SNAPPY=ON \
+                -DBUILD_TESTS=OFF ../pdlfs-common
           echo "cmake done"
 
       #
-      # build and install standalone common
+      # build and install standalone common library
       #
       - name: build and install standalone pdlfs-common
         run: date && cd /tmp/pdlfs-common/src/b && make && make install && date
 
       #
-      # build config with external common library
+      # config with external common library
       #
       - name: configure project w/external common lib
         run: |
@@ -224,13 +226,13 @@ jobs:
           echo "cmake done"
 
       #
-      # build project
+      # build project with external library
       #
       - name: build project w/external common lib
         run: date && cd bx && make && date
 
       #
-      # run tests
+      # run tests with external library
       #
       - name: run tests w/external common lib
         run: date && cd bx && ctest -VV --output-on-failure && date
