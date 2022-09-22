@@ -178,10 +178,11 @@ jobs:
       # run tests
       #
       - name: run tests
-        run: date && cd b && ctest -VV --output-on-failure && date
+        run: date && cd b && echo ctest -VV --output-on-failure && date
 
       #
-      # now let's repeat with an external (!INTREE) common library
+      # now let's repeat with an external (!INTREE) common library.
+      # first checkout and configure the library...
       #
       - name: checkout and configure standalone pdlfs-common
         run: |
@@ -195,6 +196,12 @@ jobs:
                 -DCMAKE_BUILD_TYPE="$CI_BUILDTYPE" \
                 -DBUILD_SHARED_LIBS=ON \
                 -DPDLFS_COMMON_LIBNAME="tablefs-common" \
-                -DDPDLFS_COMMON_DEFINES="TABLEFS" \
+                -DPDLFS_COMMON_DEFINES="TABLEFS" \
                 -DBUILD_TESTS=ON ../pdlfs-common
           echo "cmake done"
+
+      #
+      # build common
+      #
+      - name: build pdlfs-common
+        run: date && cd /tmp/pdlfs-common/src/b && make && make install && date
